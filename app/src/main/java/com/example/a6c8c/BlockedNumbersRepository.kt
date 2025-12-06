@@ -10,6 +10,7 @@ object BlockedNumbersRepository {
     
     var block600 by mutableStateOf(false)
     var block800 by mutableStateOf(false)
+    var blockUnknown by mutableStateOf(false)
 
     fun addNumber(number: String) {
         if (!blockedNumbers.contains(number)) {

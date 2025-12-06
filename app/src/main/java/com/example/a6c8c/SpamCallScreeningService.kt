@@ -1,5 +1,9 @@
 package com.example.a6c8c
 
+import android.content.Context
+import android.database.Cursor
+import android.net.Uri
+import android.provider.ContactsContract
 import android.telecom.Call
 import android.telecom.CallScreeningService
 import android.telecom.Call.Details
@@ -19,8 +23,21 @@ class SpamCallScreeningService : CallScreeningService() {
                 (normalizedNumber.startsWith("+56800") || normalizedNumber.startsWith("800"))
                 
             val isSpecificBlocked = BlockedNumbersRepository.isBlocked(phoneNumber)
+
+            val blockUnknown = BlockedNumbersRepository.blockUnknown && !isContact(this, phoneNumber)
             
-            block600 || block800 || isSpecificBlocked
+            if (block600) {
+                BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_600, System.currentTimeMillis()))
+                true
+            } else if (block800) {
+                BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_800, System.currentTimeMillis()))
+                true
+            } else if (isSpecificBlocked || blockUnknown) {
+                BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_OTHER, System.currentTimeMillis()))
+                true
+            } else {
+                false
+            }
         } else {
             false
         }
@@ -48,5 +65,22 @@ class SpamCallScreeningService : CallScreeningService() {
 
     private fun getPhoneNumber(callDetails: Call.Details): String? {
         return callDetails.handle?.schemeSpecificPart
+    }
+
+    private fun isContact(context: Context, number: String): Boolean {
+        val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))
+        val projection = arrayOf(ContactsContract.PhoneLookup.DISPLAY_NAME)
+        var cursor: Cursor? = null
+        try {
+            cursor = context.contentResolver.query(uri, projection, null, null, null)
+            if (cursor != null && cursor.moveToFirst()) {
+                return true
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            cursor?.close()
+        }
+        return false
     }
 }
