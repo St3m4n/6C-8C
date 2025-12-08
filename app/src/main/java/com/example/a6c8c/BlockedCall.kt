@@ -2,7 +2,7 @@ package com.example.a6c8c
 
 enum class BlockType {
     TYPE_600,
-    TYPE_800,
+    TYPE_809,
     TYPE_OTHER
 }
 

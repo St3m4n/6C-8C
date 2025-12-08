@@ -59,11 +59,11 @@ fun MainScreen() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && roleManager != null) {
             if (roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
                 BlockedNumbersRepository.block600 = true
-                BlockedNumbersRepository.block800 = true
+                BlockedNumbersRepository.block809 = true
                 Toast.makeText(context, "Permiso concedido", Toast.LENGTH_SHORT).show()
             } else {
                 BlockedNumbersRepository.block600 = false
-                BlockedNumbersRepository.block800 = false
+                BlockedNumbersRepository.block809 = false
                 Toast.makeText(context, "Permiso denegado", Toast.LENGTH_SHORT).show()
             }
         }
@@ -86,7 +86,7 @@ fun MainScreen() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && roleManager != null) {
             if (roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
                 BlockedNumbersRepository.block600 = true
-                BlockedNumbersRepository.block800 = true
+                BlockedNumbersRepository.block809 = true
             } else {
                 if (roleManager.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING)) {
                     val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
@@ -107,8 +107,8 @@ fun MainScreen() {
                     onClick = { selectedTab = 0 }
                 )
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Block, contentDescription = "800") },
-                    label = { Text("800") },
+                    icon = { Icon(Icons.Default.Block, contentDescription = "809") },
+                    label = { Text("809") },
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 }
                 )
@@ -154,25 +154,25 @@ fun MainScreen() {
                 )
             }
 
-            // 800 Switch
+            // 809 Switch
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Bloquear +56 800 *")
+                Text("Bloquear +56 809 *")
                 Switch(
-                    checked = BlockedNumbersRepository.block800,
+                    checked = BlockedNumbersRepository.block809,
                     onCheckedChange = { isChecked ->
                         if (isChecked) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && roleManager != null && !roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
                                 val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
                                 roleLauncher.launch(intent)
                             } else {
-                                BlockedNumbersRepository.block800 = true
+                                BlockedNumbersRepository.block809 = true
                             }
                         } else {
-                            BlockedNumbersRepository.block800 = false
+                            BlockedNumbersRepository.block809 = false
                         }
                     }
                 )
@@ -225,7 +225,7 @@ fun MainScreen() {
             Text(
                 text = when(selectedTab) {
                     0 -> "Historial 600"
-                    1 -> "Historial 800"
+                    1 -> "Historial 809"
                     else -> "Historial Otros"
                 }, 
                 style = MaterialTheme.typography.titleMedium
@@ -234,7 +234,7 @@ fun MainScreen() {
             Box(modifier = Modifier.weight(1f)) {
                 when (selectedTab) {
                     0 -> BlockedCallList(BlockType.TYPE_600)
-                    1 -> BlockedCallList(BlockType.TYPE_800)
+                    1 -> BlockedCallList(BlockType.TYPE_809)
                     2 -> BlockedCallList(BlockType.TYPE_OTHER)
                 }
             }

@@ -19,8 +19,8 @@ class SpamCallScreeningService : CallScreeningService() {
             val block600 = BlockedNumbersRepository.block600 && 
                 (normalizedNumber.startsWith("+56600") || normalizedNumber.startsWith("600"))
             
-            val block800 = BlockedNumbersRepository.block800 && 
-                (normalizedNumber.startsWith("+56800") || normalizedNumber.startsWith("800"))
+            val block809 = BlockedNumbersRepository.block809 && 
+                (normalizedNumber.startsWith("+56809") || normalizedNumber.startsWith("809"))
                 
             val isSpecificBlocked = BlockedNumbersRepository.isBlocked(phoneNumber)
 
@@ -29,8 +29,8 @@ class SpamCallScreeningService : CallScreeningService() {
             if (block600) {
                 BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_600, System.currentTimeMillis()))
                 true
-            } else if (block800) {
-                BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_800, System.currentTimeMillis()))
+            } else if (block809) {
+                BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_809, System.currentTimeMillis()))
                 true
             } else if (isSpecificBlocked || blockUnknown) {
                 BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_OTHER, System.currentTimeMillis()))

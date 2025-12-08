@@ -9,7 +9,7 @@ object BlockedNumbersRepository {
     val blockedNumbers = mutableStateListOf<String>()
     
     var block600 by mutableStateOf(false)
-    var block800 by mutableStateOf(false)
+    var block809 by mutableStateOf(false)
     var blockUnknown by mutableStateOf(false)
 
     fun addNumber(number: String) {
