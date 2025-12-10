@@ -11,6 +11,7 @@ import android.telecom.Call.Details
 class SpamCallScreeningService : CallScreeningService() {
 
     override fun onScreenCall(callDetails: Call.Details) {
+        BlockedNumbersRepository.load(this)
         val phoneNumber = getPhoneNumber(callDetails)
         
         val shouldBlock = if (phoneNumber != null) {
@@ -27,13 +28,13 @@ class SpamCallScreeningService : CallScreeningService() {
             val blockUnknown = BlockedNumbersRepository.blockUnknown && !isContact(this, phoneNumber)
             
             if (block600) {
-                BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_600, System.currentTimeMillis()))
+                BlockedCallHistoryRepository.addCall(this, BlockedCall(phoneNumber, BlockType.TYPE_600, System.currentTimeMillis()))
                 true
             } else if (block809) {
-                BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_809, System.currentTimeMillis()))
+                BlockedCallHistoryRepository.addCall(this, BlockedCall(phoneNumber, BlockType.TYPE_809, System.currentTimeMillis()))
                 true
             } else if (isSpecificBlocked || blockUnknown) {
-                BlockedCallHistoryRepository.addCall(BlockedCall(phoneNumber, BlockType.TYPE_OTHER, System.currentTimeMillis()))
+                BlockedCallHistoryRepository.addCall(this, BlockedCall(phoneNumber, BlockType.TYPE_OTHER, System.currentTimeMillis()))
                 true
             } else {
                 false

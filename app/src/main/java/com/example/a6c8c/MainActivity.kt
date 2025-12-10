@@ -32,6 +32,8 @@ import java.util.Locale
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        BlockedNumbersRepository.load(this) // Load settings on startup
+        BlockedCallHistoryRepository.load(this) // Load history on startup
         enableEdgeToEdge()
         setContent {
             _6C8CTheme(darkTheme = true) {
@@ -60,10 +62,12 @@ fun MainScreen() {
             if (roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
                 BlockedNumbersRepository.block600 = true
                 BlockedNumbersRepository.block809 = true
+                BlockedNumbersRepository.save(context)
                 Toast.makeText(context, "Permiso concedido", Toast.LENGTH_SHORT).show()
             } else {
                 BlockedNumbersRepository.block600 = false
                 BlockedNumbersRepository.block809 = false
+                BlockedNumbersRepository.save(context)
                 Toast.makeText(context, "Permiso denegado", Toast.LENGTH_SHORT).show()
             }
         }
@@ -75,8 +79,10 @@ fun MainScreen() {
     ) { isGranted: Boolean ->
         if (isGranted) {
             BlockedNumbersRepository.blockUnknown = true
+            BlockedNumbersRepository.save(context)
         } else {
             BlockedNumbersRepository.blockUnknown = false
+            BlockedNumbersRepository.save(context)
             Toast.makeText(context, "Se requiere permiso de contactos", Toast.LENGTH_SHORT).show()
         }
     }
@@ -85,8 +91,12 @@ fun MainScreen() {
     LaunchedEffect(Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && roleManager != null) {
             if (roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
-                BlockedNumbersRepository.block600 = true
-                BlockedNumbersRepository.block809 = true
+                // Ensure UI reflects permission state if already held
+                // But don't overwrite user preference if they turned it off manually?
+                // For now, let's assume if permission is held, we enable features or respect saved state.
+                // Since we loaded state in onCreate, we should just respect that.
+                // But if it's the first run, we might want to enable them.
+                // Let's leave it as is, just checking role availability.
             } else {
                 if (roleManager.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING)) {
                     val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
@@ -146,9 +156,11 @@ fun MainScreen() {
                                 roleLauncher.launch(intent)
                             } else {
                                 BlockedNumbersRepository.block600 = true
+                                BlockedNumbersRepository.save(context)
                             }
                         } else {
                             BlockedNumbersRepository.block600 = false
+                            BlockedNumbersRepository.save(context)
                         }
                     }
                 )
@@ -170,9 +182,11 @@ fun MainScreen() {
                                 roleLauncher.launch(intent)
                             } else {
                                 BlockedNumbersRepository.block809 = true
+                                BlockedNumbersRepository.save(context)
                             }
                         } else {
                             BlockedNumbersRepository.block809 = false
+                            BlockedNumbersRepository.save(context)
                         }
                     }
                 )
@@ -192,6 +206,7 @@ fun MainScreen() {
                             permissionLauncher.launch(android.Manifest.permission.READ_CONTACTS)
                         } else {
                             BlockedNumbersRepository.blockUnknown = false
+                            BlockedNumbersRepository.save(context)
                         }
                     }
                 )
@@ -211,7 +226,7 @@ fun MainScreen() {
                 )
                 IconButton(onClick = {
                     if (newNumber.isNotBlank()) {
-                        BlockedNumbersRepository.addNumber(newNumber)
+                        BlockedNumbersRepository.addNumber(context, newNumber)
                         newNumber = ""
                     }
                 }) {
